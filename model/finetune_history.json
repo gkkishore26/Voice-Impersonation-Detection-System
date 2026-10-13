@@ -1,0 +1,22 @@
+{
+ "epochs": 10,
+ "lr": 0.0001,
+ "base_epoch": 40,
+ "best_val_acc": 98.75,
+ "final": {
+  "loss": 0.05602897722274065,
+  "acc": 96.25,
+  "tp": 37,
+  "tn": 40,
+  "fp": 0,
+  "fn": 3,
+  "precision": 1.0,
+  "recall": 0.925,
+  "f1": 0.961038961038961,
+  "n": 80
+ },
+ "field_sources": [
+  "ElevenLabs_2026-10-11T03_38_34_Russ \u2013 Deep, Smooth and Articulate_pvc_sp110_s50_sb75_se0_b_m2.mp3",
+  "motivation is a myth.mp3"
+ ]
+}

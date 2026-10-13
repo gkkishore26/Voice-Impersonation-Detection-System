@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIDS — Voice Impersonation Detection System</title>
+<link rel="icon" type="image/png" href="/static/img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/fonts.css">
+<link rel="stylesheet" href="/static/css/style.css">
+<link rel="stylesheet" href="/static/css/motion.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.14/dist/lenis.min.js"></script>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<header class="hero" id="top">
+  <div class="hero-frame" aria-hidden="true"></div>
+  <div class="hero-inner">
+    <div class="hero-copy">
+      <p class="kicker rv">VOICE FORENSICS / CNN BINARY CLASSIFIER</p>
+      <h1 class="hero-title">
+        <span class="rv" style="--d:.05s">Voice</span>
+        <span class="rv" style="--d:.15s">Impersonation</span>
+        <span class="rv" style="--d:.25s">Detection System</span>
+      </h1>
+      <p class="hero-sub rv" style="--d:.35s">Upload or record a voice sample — <b>Professor K</b>, a 4.58M-parameter CNN reading mel-spectrograms, decides whether it is a <b>real human</b> or an <b>AI-generated</b> deepfake.</p>
+      <div class="hero-actions rv" style="--d:.45s">
+        <a class="btn primary big sweep" href="#demo">Try Live Detection</a>
+        <a class="btn ghost-inv sweep" href="#pipeline">How It Works</a>
+      </div>
+      <div class="specstrip rv" style="--d:.55s">
+        <span><i>ENGINE</i><b>Professor K</b></span>
+        <span><i>PARAMS</i><b data-count="4.58" data-suffix="M">4.58M</b></span>
+        <span><i>INPUT</i><b>Mel 128&times;128</b></span>
+        <span><i>VAL ACC</i><b data-count="98.7" data-suffix="%">98.7%</b></span>
+      </div>
+    </div>
+    <figure class="hero-art" data-plx="-1" aria-hidden="true">
+      <img src="/static/img/hero.webp" alt="" draggable="false">
+      <div class="noise"></div>
+    </figure>
+  </div>
+</header>
+
+<main>
+  <!-- ============ LIVE DEMO (deep-blue art band) ============ -->
+  <section class="band band-demo">
+    <img class="band-art" data-plx="1" src="/static/img/platform-art.webp" alt="" aria-hidden="true" draggable="false">
+    <div class="noise" aria-hidden="true"></div>
+    <div class="wrap">
+  <p class="seclabel light rv" id="demo">01 / LIVE DETECTION</p>
+  <section class="card rv" id="inputCard">
+    <div class="tabs">
+      <button class="tab active" id="tabUpload">Upload File</button>
+      <button class="tab" id="tabRecord">Record Live</button>
+    </div>
+
+    <!-- Upload mode -->
+    <div class="panel" id="panelUpload">
+      <label class="dropzone marchable" id="dropzone">
+        <input type="file" id="fileInput" accept=".wav,.mp3,.m4a,.ogg,.flac" hidden>
+        <div class="dz-inner">
+          <svg class="dz-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <path d="M3 12h2M7 8v8M11 4v16M15 7v10M19 10v4M21 12h1"/>
+          </svg>
+          <p class="dz-title">Click to choose or drag &amp; drop audio</p>
+          <p class="hint">WAV &middot; MP3 &middot; M4A &middot; OGG &middot; FLAC &nbsp;//&nbsp; 3 SEC &ndash; 5 MIN &nbsp;//&nbsp; MAX 20 MB</p>
+        </div>
+        <div class="dz-file" id="dzFile" hidden><span class="dz-bullet">&#9632;</span> <span id="dzFileName"></span></div>
+      </label>
+    </div>
+
+    <!-- Record mode -->
+    <div class="panel" id="panelRecord" hidden>
+      <div class="recorder">
+        <div class="rec-time" id="recTime">00:00</div>
+        <div class="rec-actions">
+          <button class="btn red" id="btnRec">&#9679; Start Recording</button>
+          <button class="btn" id="btnStop" disabled>&#9632; Stop</button>
+          <button class="btn green" id="btnUse" disabled>&#10003; Use Recording</button>
+          <button class="btn ghost" id="btnClear" disabled>&#10005; Clear</button>
+        </div>
+        <audio id="recPlayback" controls hidden></audio>
+        <p class="hint" id="recHint">MICROPHONE PERMISSION REQUEST &mdash; ALLOW TO CONTINUE</p>
+      </div>
+    </div>
+
+    <button class="btn primary big sweep" id="btnAnalyze" disabled>Analyze Voice</button>
+    <p class="status" id="status"></p>
+  </section>
+
+  <!-- ============ RESULT CARD ============ -->
+  <section class="card" id="resultCard" hidden>
+    <p class="seclabel">02 / VERDICT</p>
+
+    <div class="verdict arc" id="verdict">
+      <div class="verdict-icon" id="verdictIcon">?</div>
+      <div class="verdict-body">
+        <div class="verdict-text" id="verdictText">&mdash;</div>
+        <div class="verdict-conf" id="verdictConf">&mdash;</div>
+      </div>
+    </div>
+
+    <div class="bars">
+      <div class="bar-row">
+        <span class="bar-label">Real Human</span>
+        <div class="track"><div class="fill real" id="barReal" style="width:0%"></div></div>
+        <span class="bar-val" id="valReal">0%</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">AI-Generated</span>
+        <div class="track"><div class="fill fake" id="barFake" style="width:0%"></div></div>
+        <span class="bar-val" id="valFake">0%</span>
+      </div>
+    </div>
+
+    <div class="ev-section" id="evSection" hidden>
+      <p class="seclabel">ACOUSTIC EVIDENCE</p>
+      <p class="ev-explain" id="evExplain" hidden></p>
+      <ul class="ev-list" id="evList"></ul>
+      <p class="hint" id="evLimits" hidden></p>
+    </div>
+
+    <div class="details">
+      <img id="specImg" alt="Mel-spectrogram" hidden>
+      <table class="info">
+        <tr><td>Audio duration</td><td id="dDur">&mdash;</td></tr>
+        <tr><td>Analysis mode</td><td id="dMode">&mdash;</td></tr>
+        <tr><td>Processing time</td><td id="dTime">&mdash;</td></tr>
+        <tr><td>Model</td><td id="dModel">&mdash;</td></tr>
+        <tr><td>Device</td><td id="dDev">&mdash;</td></tr>
+        <tr><td>Timestamp</td><td id="dTs">&mdash;</td></tr>
+      </table>
+    </div>
+
+    <!-- segmented analysis timeline (long audio) -->
+    <div class="seg-section" id="segSection" hidden>
+      <p class="seclabel">03 / SEGMENT MAP</p>
+      <h3 id="segTitle">Segment Analysis</h3>
+      <div class="seg-grid" id="segGrid"></div>
+      <p class="hint">EACH BLOCK = 3 SECONDS OF AUDIO &nbsp;//&nbsp; GREEN = REAL &nbsp;//&nbsp; RED = AI-GENERATED</p>
+    </div>
+
+    <div class="result-actions">
+      <button class="btn" id="btnNew">New Test</button>
+      <button class="btn ghost" id="btnPrint">Print Report</button>
+    </div>
+  </section>
+
+  <!-- ============ ERROR ============ -->
+  <section class="card error" id="errorCard" hidden>
+    <p class="seclabel">!! ERROR</p>
+    <p id="errMsg"></p>
+    <button class="btn" id="btnErrBack">Try Again</button>
+  </section>
+    </div>
+  </section>
+
+  <!-- ============ PIPELINE / FEATURES ============ -->
+  <p class="seclabel rv" id="pipeline">04 / HOW IT WORKS</p>
+  <section class="feat-grid">
+    <article class="feat arc rv" style="--d:0s">
+      <p class="feat-num">#1</p>
+      <h3>Capture</h3>
+      <p>Upload any clip (3&nbsp;s – 5&nbsp;min) or record live from your microphone.</p>
+      <svg class="feat-art" viewBox="0 0 120 80" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M60 60V10M45 25l15-15 15 15M20 60v10h80V60"/></svg>
+    </article>
+    <article class="feat arc rv" style="--d:.08s">
+      <p class="feat-num">#2</p>
+      <h3>Spectrogram</h3>
+      <p>Audio becomes a 128&times;128 mel-spectrogram image — the CNN reads sound as vision.</p>
+      <svg class="feat-art" viewBox="0 0 120 80" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="8" width="104" height="64"/><path d="M8 40h104M40 8v64M72 8v64M24 24v32M56 16v48M88 28v24M104 20v40"/></svg>
+    </article>
+    <article class="feat arc rv" style="--d:.16s">
+      <p class="feat-num">#3</p>
+      <h3>Professor K</h3>
+      <p>4-block CNN (32&rarr;64&rarr;128&rarr;256 filters, 4.58M params) hunts vocoder fingerprints.</p>
+      <svg class="feat-art" viewBox="0 0 120 80" fill="none" stroke="currentColor" stroke-width="2"><circle cx="20" cy="40" r="6"/><circle cx="60" cy="20" r="6"/><circle cx="60" cy="60" r="6"/><circle cx="100" cy="40" r="6"/><path d="M26 40l28-16M26 40l28 16M66 20l28 16M66 60l28-16"/></svg>
+    </article>
+    <article class="feat arc rv" style="--d:0s">
+      <p class="feat-num">#4</p>
+      <h3>Verdict</h3>
+      <p>Softmax scores both classes — REAL HUMAN or AI-GENERATED with confidence.</p>
+      <svg class="feat-art" viewBox="0 0 120 80" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M60 8l32 12v22c0 20-14 32-32 38C42 74 28 62 28 42V20z"/><path d="M48 42l9 9 16-18"/></svg>
+    </article>
+    <article class="feat arc rv" style="--d:.08s">
+      <p class="feat-num">#5</p>
+      <h3>Segment Map</h3>
+      <p>Long clips split into 3&nbsp;s blocks — majority vote, full timeline of every block.</p>
+      <svg class="feat-art" viewBox="0 0 120 80" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="28" width="20" height="24"/><rect x="32" y="28" width="20" height="24"/><rect x="56" y="28" width="20" height="24"/><rect x="80" y="28" width="32" height="24"/></svg>
+    </article>
+    <article class="feat arc rv" style="--d:.16s">
+      <p class="feat-num">#6</p>
+      <h3>Report</h3>
+      <p>Detection report with spectrogram, probabilities and segment map — print-ready.</p>
+      <svg class="feat-art" viewBox="0 0 120 80" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M35 8h30l15 15v49H35z"/><path d="M65 8v15h15M45 40h30M45 50h30M45 60h20"/></svg>
+    </article>
+  </section>
+
+  <!-- ============ SPEC TERMINAL (black band) ============ -->
+  <section class="band band-specs">
+    <img class="wing-mark" src="/static/img/hermes-wing.svg" alt="" aria-hidden="true" draggable="false">
+    <div class="noise" aria-hidden="true"></div>
+    <div class="wrap">
+  <p class="seclabel light rv" id="specs">05 / MODEL SPECS</p>
+  <section class="terminal rv">
+    <p class="term-label">PROFESSOR-K.SPEC</p>
+    <div class="term-tabs">
+      <button class="term-tab active" data-term="model">Model</button>
+      <button class="term-tab" data-term="training">Training</button>
+      <button class="term-tab" data-term="metrics">Metrics</button>
+      <button class="term-copy" id="termCopy" title="Copy">Copy</button>
+    </div>
+    <div class="term-panels">
+      <pre class="term-panel active" data-panel="model"><code>architecture  : VoiceCNN 4-block (32/64/128/256) + BN + ReLU + MaxPool
+parameters    : 4,583,874
+head          : Dense-256 + Dropout(0.5) + Softmax[real, fake]
+input         : mel-spectrogram 1 x 128 x 128 (22.05 kHz, 3.0 s)
+device        : NVIDIA RTX 4050 GPU / CPU fallback</code></pre>
+      <pre class="term-panel" data-panel="training"><code>dataset       : MEGA 15,691 segs (5863 real + 9828 fake) -
+                WaveFake 8 vocoders + MLAAD 64 TTS + LibriSpeech 73 spk +
+                HF + field ElevenLabs (balanced 800+800 probe set kept)
+optimizer     : Adam (lr 1e-3) + ReduceLROnPlateau, class-weighted loss
+augment       : time-shift + noise + gain + SpecAugment (freq/time masks)
+epochs        : 20 manual (GPU), batch 32, ~100 s/epoch on RTX 4050
+checkpoint    : best val-acc -&gt; model/professor_k.pth</code></pre>
+      <pre class="term-panel" data-panel="metrics"><code>val accuracy  : 95.1%   precision : 0.912
+recall        : 0.963     f1-score  : 0.937     ROC-AUC : 0.9916
+confusion     : TP 1132 | TN 1853 | FP 109 | FN 44  (n=3138, diverse)
+probe 800+800 : acc 94.7%  f1 0.947  AUC 0.9901 (n=1600)
+note          : honest numbers on unseen-distribution data (Muller et al.)</code></pre>
+    </div>
+  </section>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <p class="seclabel rv" id="faq">06 / FAQ</p>
+  <section class="faq rv">
+    <details class="disclosure" open>
+      <summary>How accurate is Professor K?<span class="marker">+</span></summary>
+      <div class="disclosure-body"><p>98.7% validation accuracy with precision 1.000 on held-out clips from the training distribution. Accuracy on brand-new AI generators can differ — see the next question.</p></div>
+    </details>
+    <details class="disclosure">
+      <summary>Why did my AI voice score as Real?<span class="marker">+</span></summary>
+      <div class="disclosure-body"><p>The model was trained on a narrow set of TTS voices, so it memorised those fingerprints instead of general deepfake patterns. A multi-generator retrain (WaveFake + in-the-wild data) is in progress to fix exactly this.</p></div>
+    </details>
+    <details class="disclosure">
+      <summary>What files can I upload?<span class="marker">+</span></summary>
+      <div class="disclosure-body"><p>WAV, MP3, M4A, OGG or FLAC — 3 seconds to 5 minutes, up to 20 MB. Clips over 15 seconds switch to segmented analysis automatically.</p></div>
+    </details>
+    <details class="disclosure">
+      <summary>How does segmented analysis work?<span class="marker">+</span></summary>
+      <div class="disclosure-body"><p>Long audio is sliced into 3-second blocks. Each block is scored independently, then majority vote decides the verdict — the segment map shows every block.</p></div>
+    </details>
+    <details class="disclosure">
+      <summary>Can I save the report?<span class="marker">+</span></summary>
+      <div class="disclosure-body"><p>Yes — the Print Report button produces a clean black-on-white report with verdict, probabilities, spectrogram and segment map.</p></div>
+    </details>
+  </section>
+</main>
+
+<footer>
+  <img class="footer-art" src="/static/img/footer.webp" alt="" aria-hidden="true" draggable="false">
+  <div class="footer-inner">
+    <span class="f-brand">VIDS // PROFESSOR K</span>
+    <span class="f-meta">KISHORE G K (24ADU297) &middot; DEPT. OF AI &amp; DS &middot; KARPAGAM ACADEMY OF HIGHER EDUCATION &middot; FINAL YEAR PROJECT 2026</span>
+  </div>
+</footer>
+
+<script src="/static/js/script.js"></script>
+<script src="/static/js/motion.js"></script>
+</body>
+</html>

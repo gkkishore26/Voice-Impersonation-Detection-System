@@ -1,0 +1,16 @@
+# VIDS .gitignore — keep repo lean; weights via Releases (Git LFS or attachments)
+dataset/
+model/*.pth
+model/presets/
+Software/dist/
+Software/build/
+Software/exe_env/
+Software/test_install/
+Software/*.exe
+__pycache__/
+*.pyc
+webapp/static/audio/*.png
+webapp/static/audio/*.wav
+webapp/static/audio/*.mp3
+webapp/static/audio/*.webm
+*.log

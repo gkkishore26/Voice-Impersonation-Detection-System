@@ -1,0 +1,39 @@
+/* ============================================================
+   VIDS fonts.css — exact Hermes typefaces (local woff2).
+   Display: Rules Gothic Compressed / Condensed
+   Mono/labels: Aeonik Fono Pro
+   Variable: Rules Variable (wght 100-900, wdth 25-200)
+   ============================================================ */
+
+@font-face {
+  font-family: 'Aeonik Fono Pro';
+  src: url('/static/fonts/aeonik-fono-pro.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Rules Gothic Compressed';
+  src: url('/static/fonts/rules-gothic-compressed.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Rules Gothic Condensed';
+  src: url('/static/fonts/rules-gothic-condensed.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Rules Variable';
+  src: url('/static/fonts/rules-variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-stretch: 25% 200%;
+  font-style: normal;
+  font-display: swap;
+}
