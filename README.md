@@ -7,6 +7,14 @@ CNN (Professor K, 4.58M params) classifies voice clips as
 **Real Human** or **AI-Generated** from mel-spectrograms,
 with acoustic evidence, calibrated confidence, and UNCERTAIN verdicts.
 
+## ⬇ Download the app
+
+**[Download VIDS Setup.exe for Windows](https://github.com/gkkishore26/Voice-Impersonation-Detection-System/releases)**
+— no admin needed. The full **Quick Start guide** (install, usage,
+performance, limitations) is on the release page.
+
+## For developers
+
 ## Run (web demo)
 ```powershell
 python webapp/app.py
