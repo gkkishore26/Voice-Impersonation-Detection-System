@@ -4,7 +4,7 @@
 #define MyAppName "Voice Impersonation Detection System"
 #define MyAppShort "VIDS"
 #define MyAppVersion "1.0"
-#define MyAppPublisher "KISHORE G K (24ADU297)"
+#define MyAppPublisher "VIDS Project"
 
 [Setup]
 AppId={{8F3A1B2C-VIDS-4D5E-9F01-PROFESSORK}}

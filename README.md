@@ -1,7 +1,7 @@
 # Voice Impersonation Detection System (VIDS)
 
-Final-year project — **KISHORE G K (24ADU297)**, Dept. of AI & DS,
-Karpagam Academy of Higher Education.
+Final-year B.Sc. Computer Science (AI & DS) project — a CNN-based
+voice deepfake detector.
 
 CNN (Professor K, 4.58M params) classifies voice clips as
 **Real Human** or **AI-Generated** from mel-spectrograms,

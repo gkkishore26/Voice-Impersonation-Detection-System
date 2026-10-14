@@ -9,6 +9,24 @@ import os
 FIGDIR = r"C:\Users\Kishore GK\Desktop\VIDS\Report\figures"
 OUTDOC = r"C:\Users\Kishore GK\Desktop\VIDS\Report\Voice_Impersonation_Detection_System_Report.docx"
 
+# Personal submission details live OUTSIDE version control so the public
+# script carries no names. Local file: Report/details.json (gitignored).
+def _load_details():
+    defaults = {'student': '[STUDENT NAME]', 'register_no': '[REGISTER NO]',
+                'guide': '[GUIDE NAME]', 'section': '[SECTION]',
+                'college': '[COLLEGE NAME]', 'city': '[CITY]',
+                'university_note': '', 'department': 'Department of Artificial Intelligence and Data Science',
+                'academic_year': '2024 - 2027'}
+    try:
+        with open(os.path.join(os.path.dirname(OUTDOC), 'details.json'), encoding='utf-8') as f:
+            defaults.update(json.load(f))
+    except Exception:
+        pass
+    return defaults
+
+
+P = _load_details()
+
 doc = Document()
 
 # ---------- page setup ----------
@@ -137,25 +155,25 @@ para('Submitted in partial fulfillment of the requirements for the degree of',
 para('BACHELOR OF SCIENCE IN COMPUTER SCIENCE\n(Artificial Intelligence and Data Science)',
      bold=True, align='center', size=12.5, space_after=18)
 para('DEPARTMENT OF ARTIFICIAL INTELLIGENCE AND DATA SCIENCE', bold=True, align='center', size=12.5, space_after=2)
-para('KARPAGAM ACADEMY OF HIGHER EDUCATION', bold=True, align='center', size=13, space_after=2)
-para('COIMBATORE', bold=True, align='center', size=12, space_after=2)
-para('(A Deemed to be University)', align='center', size=12, space_after=30)
+para(P['college'].upper(), bold=True, align='center', size=13, space_after=2)
+para(P['city'].upper(), bold=True, align='center', size=12, space_after=2)
+para(P['university_note'], align='center', size=12, space_after=30)
 para('Submitted by:', bold=True, align='center', size=12, space_after=2)
-para('KISHORE G K', bold=True, align='center', size=14, space_after=2)
-para('Register No. : 24ADU297', align='center', size=12, space_after=2)
-para('Department of Artificial Intelligence and Data Science', align='center', size=12, space_after=24)
+para(P['student'], bold=True, align='center', size=14, space_after=2)
+para('Register No. : ' + P['register_no'], align='center', size=12, space_after=2)
+para(P['department'], align='center', size=12, space_after=24)
 para('Under the guidance of', align='center', size=12, space_after=2)
-para('MR. G. SAM PRAKASH', bold=True, align='center', size=12, space_after=2)
+para(P['guide'], bold=True, align='center', size=12, space_after=2)
 pb()
 
 # ================= CERTIFICATE =================
 para('CERTIFICATE', bold=True, align='center', size=15, space_after=18)
 para('Certified that this project report on the topic "Voice Impersonation Detection System" '
-     'is the bonafide work of KISHORE G K, bearing the register number 24ADU297, carried out '
-     'under the guidance of MR. G. SAM PRAKASH during the academic year 2024 – 2027 in '
+     'is the bonafide work of ' + P['student'] + ', bearing the register number ' + P['register_no'] + ', carried out '
+     'under the guidance of ' + P['guide'] + ' during the academic year ' + P['academic_year'] + ' in '
      'partial fulfillment of the requirements for the award of the degree Bachelor of Science in Computer Science '
-     '(Artificial Intelligence and Data Science) of Karpagam Academy of Higher Education, '
-     'Coimbatore (A Deemed to be University).',
+     '(Artificial Intelligence and Data Science) of ' + P['college'] + ', '
+     + P['city'] + ' ' + P['university_note'] + '.',
      align='just')
 para('')
 para('This is to certify that the project entitled "Voice Impersonation Detection System" has '
@@ -163,12 +181,12 @@ para('This is to certify that the project entitled "Voice Impersonation Detectio
      'fellowship or other similar titles.', align='just')
 para('')
 table(['Sl. No.', 'Name of the Student', 'Register No.', 'Section'],
-      [['1', 'KISHORE G K', '24ADU297', 'E']])
+      [['1', P['student'], P['register_no'], P['section']]])
 para('')
 para('Place: Coimbatore', align='left', space_after=2)
 para('Date: DD-MM-YYYY', align='left', space_after=30)
 para('Signature of the Guide', bold=True, align='left', size=11.5, space_after=4)
-para('MR. G. SAM PRAKASH\nDepartment of Artificial Intelligence and Data Science', size=11.5, space_after=20)
+para(P['guide'] + '\n' + P['department'], size=11.5, space_after=20)
 para('Signature of the Head of Department', bold=True, align='left', size=11.5, space_after=4)
 para('[HOD NAME]\nHead of the Department', size=11.5, space_after=20)
 para('Signature of the External Examiner', bold=True, align='left', size=11.5, space_after=4)
@@ -180,17 +198,16 @@ para('I hereby declare that the project report entitled "Voice Impersonation Det
      'System" submitted for the partial fulfillment of the requirements for the award of the '
      'degree Bachelor of Science in Computer Science (Artificial Intelligence and Data '
      'Science) is a record of bonafide work carried out by me under the guidance of '
-     'MR. G. SAM PRAKASH, Department of Artificial Intelligence and Data '
-     'Science, '
-     'Karpagam Academy of Higher Education, Coimbatore.', align='just')
+     + P['guide'] + ', ' + P['department'] + ', '
+     + P['college'] + ', ' + P['city'] + '.', align='just')
 para('')
 para('This project work has not been submitted, either in full or in part, for the award of '
      'any other degree, diploma, fellowship or other similar title.', align='just')
 para('')
 para('Place: Coimbatore', align='left', space_after=2)
 para('Date: DD-MM-YYYY', align='left', space_after=40)
-para('KISHORE G K', bold=True, align='center', size=12.5, space_after=2)
-para('Register No. : 24ADU297', align='center', size=11.5)
+para(P['student'], bold=True, align='center', size=12.5, space_after=2)
+para('Register No. : ' + P['register_no'], align='center', size=11.5)
 pb()
 
 # ================= ABSTRACT =================
