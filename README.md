@@ -13,6 +13,65 @@ with acoustic evidence, calibrated confidence, and UNCERTAIN verdicts.
 — no admin needed. The full **Quick Start guide** (install, usage,
 performance, limitations) is on the release page.
 
+## 🎓 Meet Professor K
+
+Professor K is the convolutional neural network at the heart of VIDS —
+a specialist trained to tell genuine human speech apart from AI-generated
+voice clones by reading sound as images.
+
+### How he sees audio
+
+Human ears hear pitch and timbre; Professor K looks at a **mel-spectrogram**
+— a 128×128 image where time runs left-to-right and frequency runs
+bottom-to-top (22.05 kHz audio, 3-second windows, 128 mel bands).
+Genuine speech paints rich, irregular harmonics across the full frequency
+range. Synthetic speech, smoothed by vocoders, leaves flatter, overly
+regular bands with missing fine detail. Those fingerprints are what he hunts.
+
+### Architecture
+
+| Layer | Detail |
+|---|---|
+| Input | 1 × 128 × 128 log-mel spectrogram |
+| Backbone | 4 CNN blocks: 32 → 64 → 128 → 256 filters, each BatchNorm + ReLU + MaxPool |
+| Head | Dense-256 + Dropout (0.5) + Softmax over [AI-Generated, Real Human] |
+| Parameters | **4,583,874** (PyTorch, GPU-trained, CPU inference) |
+
+### What he was trained on
+
+- **15,691 labelled segments**: 8 WaveFake neural vocoders, MLAAD
+  text-to-speech systems, LibriSpeech speakers, plus user-provided labelled
+  field recordings (including modern ElevenLabs voices).
+- **Progressive rounds**: supervised fine-tuning on new labelled uploads with
+  rehearsal mixing, so new voices are learned without forgetting old ones.
+- **Method**: Adam optimizer, class-weighted loss, SpecAugment frequency/time
+  masking, temperature-calibrated (T=2.5) confidence.
+
+### How he decides
+
+1. **Split** — clips over 15 s are cut into 3-second blocks; each block is
+   judged individually, majority vote decides.
+2. **Classify** — the CNN scores every block (real vs AI probabilities).
+3. **Corroborate** — an acoustic-evidence engine independently measures pitch
+   variation (yin), spectral markers, MFCC dynamics and loudness behaviour,
+   flagging synthetic tells such as flat prosody or vocoder shimmer.
+4. **Verdict** — probabilities and evidence are fused. Clear cases get a
+   confident verdict; borderline cases get an explicit **UNCERTAIN** answer
+   with the reason stated — he declines to guess rather than pretend.
+
+### Measured performance
+
+| Evaluation | Result |
+|---|---|
+| Validation, 3,138 diverse segments | **94.6%** accuracy, F1 0.930, **ROC-AUC 0.9896** |
+| Balanced probe, 1,600 segments | **94.4%**, F1 0.945 |
+| Held-out whole files (never trained on) | **16/16 correct** |
+
+Validation shares data sources with training, so treat it as optimistic —
+the held-out file tests are the honest grade. Known limits: unseen languages,
+microphones and rooms lower his confidence, which is exactly what the
+UNCERTAIN verdict and the field-data retraining loop exist to handle.
+
 ## For developers
 
 ## Run (web demo)
