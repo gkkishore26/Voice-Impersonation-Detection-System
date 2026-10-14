@@ -1,4 +1,6 @@
 # VIDS .gitignore — keep repo lean; weights via Releases (Git LFS or attachments)
+# college submission report (private) - never commit
+Report/
 # unrelated drop folder (trading notes, other students' files) - never commit
 Report/opencode/
 dataset/
